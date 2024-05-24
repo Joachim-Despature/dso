@@ -22,7 +22,8 @@
 */
 
 
-
+#define FMT_HEADER_ONLY 
+#include "fmt/format.h"
 #include "FullSystem/FullSystem.h"
  
 #include "stdio.h"

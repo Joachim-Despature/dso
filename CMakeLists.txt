@@ -4,7 +4,9 @@ PROJECT(${PROJECT_NAME})
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
-
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
+#include <fmt/core.h>
 set(BUILD_TYPE Release)
 #set(BUILD_TYPE RelWithDebInfo)
 
@@ -15,6 +17,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # required libraries
 find_package(SuiteParse REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(fmt REQUIRED)
 find_package(Boost COMPONENTS system thread) 
 
 # optional libraries
@@ -25,8 +28,8 @@ find_package(OpenCV QUIET)
 # flags
 add_definitions("-DENABLE_SSE")
 set(CMAKE_CXX_FLAGS
-   "${SSE_FLAGS} -O3 -g -std=c++0x -march=native"
-#   "${SSE_FLAGS} -O3 -g -std=c++0x -fno-omit-frame-pointer"
+   "${SSE_FLAGS} -O3 -g -std=c++14 -march=native"
+#   "${SSE_FLAGS} -O3 -g -std=c++14 -fno-omit-frame-pointer"
 )
 
 if (MSVC)
@@ -60,10 +63,9 @@ set(dso_SOURCE_FILES
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
-  ${PROJECT_SOURCE_DIR}/thirdparty/sse2neon
   ${EIGEN3_INCLUDE_DIR}
 ) 
-
+include_directories(${fmt_INCLUDE_DIRS})
 
 # decide if we have pangolin
 if (Pangolin_FOUND)
@@ -113,19 +115,22 @@ include_directories( ${CSPARSE_INCLUDE_DIR} ${CHOLMOD_INCLUDE_DIR})
 add_library(dso ${dso_SOURCE_FILES} ${dso_opencv_SOURCE_FILES} ${dso_pangolin_SOURCE_FILES})
 
 #set_property( TARGET dso APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
-
+add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # OSX
     set(BOOST_THREAD_LIBRARY boost_thread-mt)
 else()
     set(BOOST_THREAD_LIBRARY boost_thread)
 endif()
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
+#include <fmt/core.h>
 
 # build main executable (only if we have both OpenCV and Pangolin)
 if (OpenCV_FOUND AND Pangolin_FOUND)
 	message("--- compiling dso_dataset.")
 	add_executable(dso_dataset ${PROJECT_SOURCE_DIR}/src/main_dso_pangolin.cpp )
-    target_link_libraries(dso_dataset dso boost_system cxsparse ${BOOST_THREAD_LIBRARY} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS})
+    target_link_libraries(dso_dataset dso boost_system cxsparse ${BOOST_THREAD_LIBRARY} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS} fmt::fmt)
 else()
 	message("--- not building dso_dataset, since either don't have openCV or Pangolin.")
 endif()
