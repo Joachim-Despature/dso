@@ -1,3 +1,7 @@
+/home/joachim/DSO/dso/src/util/IndexThreadReduce.h:49:91: error: ‘_1’ was not declared in this scope
+   49 |  boost::bind(&IndexThreadReduce::callPerIndexDefault, this, _1, _2, _3, _4);
+      |          
+
 # DSO: Direct Sparse Odometry
 
 For more information see
