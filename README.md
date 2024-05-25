@@ -64,3 +64,23 @@ mkdir build
 cd build
 cmake ..
 make -j4
+
+Now DSO should be working
+
+#Mono_Dataset_code
+
+To make a dataset you now have to go to ~/DSO/mono_dataset_code
+
+##Build Aruco
+
+cd aruco
+mkdir build
+cd build
+cmake ..
+sudo make
+sudo make install
+
+##Build mono_dataset_code
+
+cd ~/DSO/mono_dataset_code
+cmake . && make
